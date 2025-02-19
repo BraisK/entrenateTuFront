@@ -36,7 +36,7 @@ function Navbar() {
                         <li>
                             <Link to="/profile" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Profile</Link>
                         </li>
-                        {isAdmin &&
+                        {isAuthenticated &&
                             <li>
                                 <Link to="/userList" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Usuarios</Link>
                             </li>
@@ -54,7 +54,7 @@ function Navbar() {
                         {isAuthenticated && <button onClick={logout}>Logout</button>}
                         {isAuthenticated &&
                             <span className='text-white'>
-                                {user?.email} {user?.role === 'Admin' ? 'Eres Admin' : 'Eres user'}
+                                {user?.email} {user?.role === 'admin' ? 'Eres Admin' : 'Eres user'}
                             </span>
                         }
                     </ul>
