@@ -30,7 +30,7 @@ export default function Home() {
       <Card>
         <div className="text-center">
           <p className="text-lg text-gray-700 mb-4">
-            Crea y guarda tus entrenamientos de natación de manera sencilla.
+            Crea y guarda tus entrenamientos de natación de manera muy sencilla. 
           </p>
           <div className="text-6xl text-blue-500 mb-4">🏊‍♂️</div>
           <Button>➕ Crear nuevo entreno</Button>
