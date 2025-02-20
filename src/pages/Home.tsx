@@ -1,18 +1,5 @@
 import React, { ReactNode } from "react";
 
-type Props = {
-  children: ReactNode;
-  onClick?: () => void;
-};
-
-const Button: React.FC<Props> = ({ children, onClick }) => (
-  <button
-    className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 flex items-center gap-2 transition"
-    onClick={onClick}
-  >
-    {children}
-  </button>
-);
 
 const Card: React.FC<{ children: ReactNode }> = ({ children }) => (
   <div className="mt-6 w-full max-w-2xl p-6 bg-white shadow-lg rounded-2xl">
@@ -33,7 +20,7 @@ export default function Home() {
             Crea y guarda tus entrenamientos de natación de manera muy sencilla. 
           </p>
           <div className="text-6xl text-blue-500 mb-4">🏊‍♂️</div>
-          <Button>➕ Crear nuevo entreno</Button>
+          <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 flex items-center gap-2 transition">➕ Crear nuevo entreno</button>
         </div>
       </Card>
     </div>
