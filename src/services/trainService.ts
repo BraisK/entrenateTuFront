@@ -1,10 +1,10 @@
-import Offer from "../models/Offer"
+import Train from "../models/Train"
 import { fetchAPI } from "../utils/FetchAPI"
 const API_URL_BASE = import.meta.env.VITE_API_URL_BASE
 
-export class OfferService {
+export class TrainService {
     static async search(title?: string) {
-        let url = API_URL_BASE+'/offers?'
+        let url = API_URL_BASE+'/trains?'
         if(title) url += 'title='+title
 
         return await fetchAPI(url,{
@@ -17,7 +17,7 @@ export class OfferService {
     }
 
     static async getById(id:number) {
-        return await fetchAPI(API_URL_BASE+'/offers/'+id,{
+        return await fetchAPI(API_URL_BASE+'/trains/'+id,{
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -26,29 +26,29 @@ export class OfferService {
         })
     }
 
-    static async create(offer: Partial<Offer>) {
-        return await fetchAPI(API_URL_BASE+'/offers', {
+    static async create(trains: Partial<Train>) {
+        return await fetchAPI(API_URL_BASE+'/trains', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(offer),
+            body: JSON.stringify(trains),
             credentials: 'include'
         })
     }
 
-    static async update(id:number, offer: Partial<Offer>) {
-        return await fetchAPI(API_URL_BASE+'/offers/'+id, {
+    static async update(id:number, trains: Partial<Train>) {
+        return await fetchAPI(API_URL_BASE+'/trains/'+id, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(offer),
+            body: JSON.stringify(trains),
             credentials: 'include'
         })
     }
     static async delete(id: number){
-        return await fetchAPI(API_URL_BASE+'/offers/'+id, {
+        return await fetchAPI(API_URL_BASE+'/trains/'+id, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'

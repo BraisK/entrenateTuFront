@@ -1,11 +1,8 @@
-export default interface Offer{
+export default interface Train{
     id: number
     title: string
     description: string
     active: boolean
-    contactEmail?: string
-    location: string
     published: string
     expired: string
-    idCategory?: number | null
 }

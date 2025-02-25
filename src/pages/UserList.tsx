@@ -54,9 +54,6 @@ function UserList() {
                         <th scope="col" className="px-6 py-3">
                             Rol
                         </th>
-                        <th scope="col" className="px-6 py-3">
-                            Curso
-                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -73,9 +70,6 @@ function UserList() {
                             </td>
                             <td className="px-6 py-4">
                                 {user.role}
-                            </td>
-                            <td className="px-6 py-4">
-                                {user.course}
                             </td>
                         </tr>
                     )}
