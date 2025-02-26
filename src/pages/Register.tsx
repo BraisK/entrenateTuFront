@@ -70,8 +70,8 @@ const Register: React.FC = () => {
     <form className="max-w-sm mx-auto min-w-sm" onSubmit={handleSubmit}>
       <InputForm text="Nombre" name="name" value={form.name || ''} handleChange={handleChange} error={errors.name} />
       <InputForm text="Apellidos" name="surname" value={form.surname || ''} handleChange={handleChange} error={errors.surname} />
-      <InputForm text="Email" name="email" value={form.email || ''} handleChange={handleChange} error={errors.email} />
-      <InputForm text="Password" name="password" value={form.password || ''} handleChange={handleChange} error={errors.password} />
+      <InputForm text="Email" name="email" type="email" value={form.email || ''} handleChange={handleChange} error={errors.email} />
+      <InputForm text="Password" type="password" name="password" value={form.password || ''} handleChange={handleChange} error={errors.password} />
 
       <div className="flex items-start mb-5">
         <div className="flex items-center h-5">
