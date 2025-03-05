@@ -27,7 +27,7 @@ const Register: React.FC = () => {
       await AuthService.registerUser(form);
 
       toast.success("Usuario registrado con éxito!");
-      navigate("/offers");
+      navigate("/login");
     } catch (error) {
       toast.error("Error al registrar el usuario.");
 

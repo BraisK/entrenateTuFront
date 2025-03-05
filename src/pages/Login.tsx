@@ -21,7 +21,7 @@ function Login() {
       //await AuthService.loginUser(form.email, form.password) // backend
       await login(form.email, form.password) // llamada al contexto
       setMessage('login successfull')
-      navigate("/trains");
+      navigate("/");
       // Redirigir a otra pagina (ofertas)
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Error desconocido'
