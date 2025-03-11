@@ -11,6 +11,8 @@ import Footer from './components/Footer'
 import Trains from './pages/TrainsList'
 import TrainForm from './pages/TrainForm'
 import TrainDetail from './pages/TrainDetail'
+import Suggestions from './pages/SuggestionsList'
+import SuggestionForm from './pages/SuggestionForm'
 
 function App() {
 
@@ -31,6 +33,10 @@ function App() {
               <Route path="/trains/:id" element={<TrainDetail />} />
               <Route path="/trains/new" element={<TrainForm />} />
               <Route path="/trains/edit/:id" element={<TrainForm />} />
+              <Route path="/suggestions" element={<Suggestions />} />
+              <Route path="/suggestions/:id" element={<TrainDetail />} />
+              <Route path="/suggestions/new" element={<SuggestionForm />} />
+              <Route path="/suggestions/edit/:id" element={<SuggestionForm />} />
             </Routes>
           </div>
           <Footer />
