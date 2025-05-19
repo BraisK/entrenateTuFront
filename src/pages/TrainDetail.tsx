@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import { TrainService } from "../services/trainService"
 import Train from "../models/Train"
+import { StarRating } from "../components/StarRating"
 
 function TrainDetail() {
     const { id } = useParams()
@@ -32,6 +33,7 @@ function TrainDetail() {
         <div className="text-white">
             <div className="text-4xl font-extrabold dark:text-white">{train.title}</div>
             <div className="text-2xl font-extrabold dark:text-white">{train.description}</div>
+            <StarRating idTrain={Number(id)} />
             <div>Activo: {train.active ? 'SI' : 'NO'}</div>
             <div>Fecha publicación: {new Date(train.published).toLocaleString()}</div>
             <div>Fecha finalización: {new Date(train.expired).toLocaleString()}</div>
