@@ -1,3 +1,5 @@
+import Rate from "./Rate"
+
 export default interface Train{
     id: number
     title: string
@@ -5,4 +7,6 @@ export default interface Train{
     active: boolean
     published: string
     expired: string
+    idUserCreator: number
+    rates?: Rate[]
 }

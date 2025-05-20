@@ -3,7 +3,10 @@ import { TrainService } from "../services/trainService"
 import { Link, useSearchParams } from "react-router-dom"
 import toast from "react-hot-toast"
 import type Train from "../models/Train"
-import { Search, Plus, Eye, Edit, Trash2 } from "lucide-react"
+import type User from "../models/User"
+import { UserService } from "../services/userServices"
+import { Search, Plus, Eye, Edit, Trash2, UserIcon, Calendar} from "lucide-react"
+import { StarRating } from "../components/StarRating"
 
 function TrainList() {
   const [queryparams, setQueryParams] = useSearchParams()
@@ -12,6 +15,7 @@ function TrainList() {
   const [trains, setTrains] = useState<Train[]>()
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [users, setUsers] = useState<Record<number, User>>({})
 
   useEffect(() => {
     TrainService.search(searchTitle)
@@ -19,6 +23,18 @@ function TrainList() {
       .catch((error) => setError(error.message))
       .finally(() => setLoading(false))
   }, [searchTitle])
+
+  useEffect(() => {
+    UserService.getAll()
+      .then((usersList) => {
+        const usersMap: Record<number, User> = {}
+        usersList.forEach((user: User) => {
+          usersMap[user.id] = user
+        })
+        setUsers(usersMap)
+      })
+      .catch(() => setUsers({}))
+  }, [])
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value
@@ -29,11 +45,21 @@ function TrainList() {
     if (!window.confirm("¿Estás seguro de que quieres borrar este entreno?")) return
     try {
       await TrainService.delete(id)
-      setTrains(trains?.filter(train => train.id != id))
+      setTrains(trains?.filter((train) => train.id != id))
       toast.success("Entreno borrado correctamente.")
     } catch (error) {
       setError(error instanceof Error ? error.message : "Error desconocido")
     }
+  }
+
+  // Función para formatear la fecha
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString("es-ES", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    })
   }
 
   return (
@@ -97,49 +123,81 @@ function TrainList() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {trains?.map((train) => (
-          <div key={train.id} className="group">
-            <div
-              className={`bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md h-full flex flex-col
-                ${train.active ? "border-2 border-green-500" : "border-2 border-red-500"}`}
-            >
-              <div className="p-6 flex-grow">
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">{train.title}</h3>
-                <p className="text-gray-600">{train.description}</p>
-              </div>
+        {trains?.map((train) => {
+          // Calculamos la valoración promedio y el número de valoraciones
 
-              <div className="bg-gray-50 px-6 py-4 border-t border-gray-100">
-                <div className="flex items-center justify-start space-x-3">
-                  <Link
-                    to={`/trains/${train.id}`}
-                    className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors"
-                  >
-                    <Eye className="w-4 h-4 mr-1" />
-                    Ver
-                  </Link>
-                  <Link
-                    to={`/trains/edit/${train.id}`}
-                    className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors"
-                  >
-                    <Edit className="w-4 h-4 mr-1" />
-                    Editar
-                  </Link>
-                  <button
-                    className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors"
-                    onClick={() => handleDelete(train.id)}
-                  >
-                    <Trash2 className="w-4 h-4 mr-1" />
-                    Borrar
-                  </button>
+          return (
+            <div key={train.id} className="group">
+              <div
+                className={`bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md h-full flex flex-col
+                  ${train.active ? "border-2 border-green-500" : "border-2 border-red-500"}`}
+              >
+                <div className="p-6 flex-grow">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-xl font-semibold text-gray-800">{train.title}</h3>
+                    {!train.active && (
+                      <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                        Inactivo
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="text-gray-600 mb-4">{train.description}</p>
+
+                  <div className="flex items-center text-sm text-gray-500 mb-2">
+                    <Calendar className="w-4 h-4 mr-1.5 text-blue-500" />
+                    <span>Publicado: {formatDate(train.published)}</span>
+                  </div>
+
+                  {users[train.idUserCreator] && (
+                    <div className="mt-4 flex items-center bg-blue-50 p-2 rounded-lg">
+                      <div className="bg-blue-100 p-1.5 rounded-full mr-2">
+                        <UserIcon className="w-4 h-4 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-700">
+                          {users[train.idUserCreator]?.name} {users[train.idUserCreator]?.surname || ""}
+                        </p>
+                        <p className="text-xs text-gray-500">{users[train.idUserCreator]?.email}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="mb-6">
+                    <h2 className="text-xl font-semibold text-gray-800 mb-3">Valoración</h2>
+                    <StarRating idTrain={Number(train.id)} />
+                  </div>
+                </div>
+
+                <div className="bg-gray-50 px-6 py-4 border-t border-gray-100">
+                  <div className="flex items-center justify-start space-x-3">
+                    <Link
+                      to={`/trains/${train.id}`}
+                      className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors"
+                    >
+                      <Eye className="w-4 h-4 mr-1" />
+                      Ver
+                    </Link>
+                    <Link
+                      to={`/trains/edit/${train.id}`}
+                      className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors"
+                    >
+                      <Edit className="w-4 h-4 mr-1" />
+                      Editar
+                    </Link>
+                    <button
+                      className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors"
+                      onClick={() => handleDelete(train.id)}
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      Borrar
+                    </button>
+                  </div>
                 </div>
               </div>
-
-              {!train.active && (
-                <div className="bg-red-50 px-4 py-2 text-xs text-red-700 font-medium">Entreno inactivo</div>
-              )}
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )
