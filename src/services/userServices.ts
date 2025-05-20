@@ -21,6 +21,16 @@ export class UserService {
             },
             credentials: "include",
         });
-
+    }
+    static async search(email?: string) {
+    let url = API_URL_BASE+'/users?'
+        if(email) url += 'email='+email    
+        return await fetchAPI(url,{
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        })
     }
 }

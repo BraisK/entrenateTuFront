@@ -1,25 +1,23 @@
-import { FormEvent, useEffect, useState } from "react"
+"use client"
+
+import { type FormEvent, useEffect, useState } from "react"
 import useFormHook from "../components/FormHook"
-import Suggestion from "../models/Suggestion"
+import type Suggestion from "../models/Suggestion"
 import { SuggestionService } from "../services/suggestionService"
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams, Link } from "react-router-dom"
 import { Temporal } from "temporal-polyfill"
 import toast from "react-hot-toast"
 
-
 function SuggestionForm() {
-
     const now = Temporal.Now.plainDateTimeISO().toString().slice(0, 16)
     const ThreeMonthsLater = Temporal.Now.plainDateTimeISO().add({ months: 3 }).toString().slice(0, 16)
 
-    //partial Offer para ahorrarse el id
-    //const ThreeMonthsLater=new Date().setMonth(new Date().getMonth()+3)
     const { datosForm, handleChange, handleChangeCheckbox, setDatosForm } = useFormHook<Partial<Suggestion>>({
         title: "",
         description: "",
         active: true,
         published: now,
-        expired: ThreeMonthsLater
+        expired: ThreeMonthsLater,
     })
 
     const [error, setError] = useState<string | null>(null)
@@ -31,78 +29,150 @@ function SuggestionForm() {
     useEffect(() => {
         if (id) {
             SuggestionService.getById(Number(id))
-            .then((data) => setDatosForm({
-                ...data,
-                published: new Date(data.published || '').toISOString().slice(0, 16),
-                expired: new Date(data.expired || '').toISOString().slice(0, 16),
-            }))
-            .catch((error: Error) => setError(error.message))
-            .finally(() => setLoading(false))
-        } else { setLoading(false) }
+                .then((data) =>
+                    setDatosForm({
+                        ...data,
+                        published: new Date(data.published || "").toISOString().slice(0, 16),
+                        expired: new Date(data.expired || "").toISOString().slice(0, 16),
+                    }),
+                )
+                .catch((error: Error) => setError(error.message))
+                .finally(() => setLoading(false))
+        } else {
+            setLoading(false)
+        }
     }, [id, setDatosForm])
-
 
     const handleSubmit = (e: FormEvent) => {
         try {
-
             e.preventDefault()
             const formData = {
                 ...datosForm,
-                published: new Date(datosForm.published || '').toISOString(),
-                expired: new Date(datosForm.expired || '').toISOString(),
+                published: new Date(datosForm.published || "").toISOString(),
+                expired: new Date(datosForm.expired || "").toISOString(),
             }
             if (id) SuggestionService.update(Number(id), formData)
             else SuggestionService.create(formData)
             navigate("/suggestions")
-            toast.success('Sugerencia guardada correctamente')
+            toast.success("Sugerencia guardada correctamente")
         } catch (error) {
             setError(error instanceof Error ? error.message : "Error desconocido")
-            toast.error('Error al guardar la sugerencia')
+            toast.error("Error al guardar la sugerencia")
         } finally {
             setLoading(false)
         }
     }
 
-
-    if (loading) return <p>Loading...</p>//da fallos
-
+    if (loading) return <p className="text-center text-gray-700 p-4">Cargando...</p>
 
     return (
-        <>
-            <div>
-                <h1>Nueva Sugerencia</h1>
-                <form onSubmit={handleSubmit} >
-                    {error && <p>{error}</p>}
-                    <div className="mb-5">
-                        <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Titulo</label>
-                        <input id="title" className="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-xs-light" placeholder="name@flowbite.com" required name="title" value={datosForm.title} onChange={handleChange} />
+        <div className="container mx-auto px-4 py-8">
+            <div className="max-w-2xl mx-auto bg-white rounded-md shadow-sm p-6">
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-2xl font-bold text-gray-800">{id ? "Editar Sugerencia" : "Nueva Sugerencia"}</h1>
+                    <Link to="/suggestions" className="text-blue-500 hover:text-blue-700 text-sm font-medium">
+                        Volver a sugerencias
+                    </Link>
+                </div>
+
+                {error && (
+                    <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-md">
+                        <p className="text-sm text-red-700">{error}</p>
                     </div>
+                )}
+
+                <form onSubmit={handleSubmit}>
                     <div className="mb-5">
-                        <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Descripción</label>
-                        <input id="description" className="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-xs-light" required name="description" value={datosForm.description} onChange={handleChange} />
-                    </div>
-                    <div className="mb-5">
-                        <label htmlFor="published" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Published</label>
-                        <input type="datetime-local" id="pusblished" className="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-xs-light" name="pusblished" value={datosForm.published} onChange={handleChange} />
-                    </div>
-                    <div className="mb-5">
-                        <label htmlFor="expired" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Expiration</label>
-                        <input type="datetime-local" id="expired" className="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-xs-light" name="expired" value={datosForm.expired} onChange={handleChange} />
-                    </div>
-                    <div className="mb-5">
-                        <label htmlFor="active" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Expiration</label>
-                        <input type="checkbox" id="active" className="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-xs-light" name="active" checked={datosForm.active} onChange={handleChangeCheckbox} />
+                        <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-700">
+                            Título
+                        </label>
+                        <input
+                            id="title"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            placeholder="Título de la sugerencia"
+                            required
+                            name="title"
+                            value={datosForm.title}
+                            onChange={handleChange}
+                        />
                     </div>
 
+                    <div className="mb-5">
+                        <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-700">
+                            Descripción
+                        </label>
+                        <textarea
+                            id="description"
+                            rows={4}
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            placeholder="Describe tu sugerencia..."
+                            required
+                            name="description"
+                            value={datosForm.description}
+                            onChange={handleChange}
+                        />
+                    </div>
 
-                    <button>Guardar</button>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+                        <div>
+                            <label htmlFor="published" className="block mb-2 text-sm font-medium text-gray-700">
+                                Fecha de publicación
+                            </label>
+                            <input
+                                type="datetime-local"
+                                id="published"
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                name="published"
+                                value={datosForm.published}
+                                onChange={handleChange}
+                            />
+                        </div>
 
+                        <div>
+                            <label htmlFor="expired" className="block mb-2 text-sm font-medium text-gray-700">
+                                Fecha de expiración
+                            </label>
+                            <input
+                                type="datetime-local"
+                                id="expired"
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                name="expired"
+                                value={datosForm.expired}
+                                onChange={handleChange}
+                            />
+                        </div>
+                    </div>
 
+                    <div className="mb-5">
+                        <div className="flex items-center">
+                            <input
+                                type="checkbox"
+                                id="active"
+                                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                                name="active"
+                                checked={datosForm.active}
+                                onChange={handleChangeCheckbox}
+                            />
+                            <label htmlFor="active" className="ml-2 text-sm font-medium text-gray-700">
+                                Sugerencia activa
+                            </label>
+                        </div>
+                        <p className="mt-1 text-xs text-gray-500">
+                            Las sugerencias activas serán visibles para todos los usuarios.
+                        </p>
+                    </div>
+
+                    <div className="flex justify-end">
+                        <button
+                            type="submit"
+                            className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md transition-colors"
+                        >
+                            Guardar
+                        </button>
+                    </div>
                 </form>
-
             </div>
-
-        </>
+        </div>
     )
 }
 
