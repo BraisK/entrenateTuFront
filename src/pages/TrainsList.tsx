@@ -3,8 +3,6 @@ import { TrainService } from "../services/trainService"
 import { Link, useSearchParams } from "react-router-dom"
 import toast from "react-hot-toast"
 import type Train from "../models/Train"
-import type User from "../models/User"
-import { UserService } from "../services/userServices"
 import { Search, Plus, Eye, Edit, Trash2, UserIcon, Calendar} from "lucide-react"
 import { StarRating } from "../components/StarRating"
 
@@ -15,7 +13,6 @@ function TrainList() {
   const [trains, setTrains] = useState<Train[]>()
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
-  const [users, setUsers] = useState<Record<number, User>>({})
 
   useEffect(() => {
     TrainService.search(searchTitle)
@@ -24,17 +21,7 @@ function TrainList() {
       .finally(() => setLoading(false))
   }, [searchTitle])
 
-  useEffect(() => {
-    UserService.getAll()
-      .then((usersList) => {
-        const usersMap: Record<number, User> = {}
-        usersList.forEach((user: User) => {
-          usersMap[user.id] = user
-        })
-        setUsers(usersMap)
-      })
-      .catch(() => setUsers({}))
-  }, [])
+
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value
@@ -149,16 +136,16 @@ function TrainList() {
                     <span>Publicado: {formatDate(train.published)}</span>
                   </div>
 
-                  {users[train.idUserCreator] && (
+                  {train.userCreator && (
                     <div className="mt-4 flex items-center bg-blue-50 p-2 rounded-lg">
                       <div className="bg-blue-100 p-1.5 rounded-full mr-2">
                         <UserIcon className="w-4 h-4 text-blue-600" />
                       </div>
                       <div>
                         <p className="text-sm font-medium text-gray-700">
-                          {users[train.idUserCreator]?.name} {users[train.idUserCreator]?.surname || ""}
+                          {train.userCreator.name} {train.userCreator.surname || ""}
                         </p>
-                        <p className="text-xs text-gray-500">{users[train.idUserCreator]?.email}</p>
+                        <p className="text-xs text-gray-500">{train.userCreator.email}</p>
                       </div>
                     </div>
                   )}

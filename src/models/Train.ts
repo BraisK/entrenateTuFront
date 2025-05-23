@@ -1,4 +1,5 @@
 import Rate from "./Rate"
+import User from "./User"
 
 export default interface Train{
     id: number
@@ -8,5 +9,6 @@ export default interface Train{
     published: string
     expired: string
     idUserCreator: number
+    userCreator?: User
     rates?: Rate[]
 }
