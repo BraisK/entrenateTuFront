@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom"
 import { TrainService } from "../services/trainService"
 import Train from "../models/Train"
 import { StarRating } from "../components/StarRating"
-import { Calendar, Clock, CheckCircle, XCircle, ArrowLeft } from "lucide-react"
+import { Calendar, Clock, ArrowLeft } from "lucide-react"
 
 function TrainDetail() {
     const { id } = useParams()
@@ -69,23 +69,7 @@ function TrainDetail() {
             >
                 <div className="p-6">
                     <div className="flex items-center justify-between mb-4">
-                        <h1 className="text-3xl font-bold text-gray-800">{train.title}</h1>
-                        <div
-                            className={`px-3 py-1 rounded-full text-sm font-medium ${train.active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                                }`}
-                        >
-                            {train.active ? (
-                                <div className="flex items-center">
-                                    <CheckCircle className="w-4 h-4 mr-1" />
-                                    Activo
-                                </div>
-                            ) : (
-                                <div className="flex items-center">
-                                    <XCircle className="w-4 h-4 mr-1" />
-                                    Inactivo
-                                </div>
-                            )}
-                        </div>
+                        <h1 className="text-3xl font-bold text-gray-800">{train.title}</h1>                        
                     </div>
 
                     <div className="bg-gray-50 rounded-lg p-4 mb-6">

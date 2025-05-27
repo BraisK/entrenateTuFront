@@ -3,7 +3,7 @@ import { TrainService } from "../services/trainService"
 import { Link, useSearchParams } from "react-router-dom"
 import toast from "react-hot-toast"
 import type Train from "../models/Train"
-import { Search, Plus, Eye, Edit, Trash2, UserIcon, Calendar} from "lucide-react"
+import { Search,  Eye, Edit, Trash2, UserIcon, Calendar} from "lucide-react"
 import { StarRating } from "../components/StarRating"
 
 function TrainList() {
@@ -72,14 +72,6 @@ function TrainList() {
             />
           </div>
         </div>
-
-        <Link
-          to="/trains/new"
-          className="inline-flex items-center px-4 py-2.5 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 transition-colors"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Añadir nuevo entreno
-        </Link>
       </div>
 
       {loading && (
