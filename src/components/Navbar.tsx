@@ -126,6 +126,16 @@ function Navbar() {
                         {isAuthenticated && (
                             <li>
                                 <Link
+                                    to="/comunidad"
+                                    className="block py-2 px-3 text-gray-700 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-500 md:p-0"
+                                >
+                                    Comunidad
+                                </Link>
+                            </li>
+                        )}
+                        {isAuthenticated && (
+                            <li>
+                                <Link
                                     to="/trains"
                                     className="block py-2 px-3 text-gray-700 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-500 md:p-0"
                                 >

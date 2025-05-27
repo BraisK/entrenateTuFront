@@ -11,4 +11,5 @@ export default interface Train{
     idUserCreator: number
     userCreator?: User
     rates?: Rate[]
+    publico: boolean
 }

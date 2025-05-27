@@ -188,6 +188,26 @@ function TrainForm() {
                                     Los entrenos activos serán visibles para todos los usuarios.
                                 </p>
                             </div>
+                            <div className="flex items-center mt-4">
+                                <input
+                                    type="checkbox"
+                                    id="publico"
+                                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                                    name="publico"
+                                    checked={datosForm.publico}
+                                    onChange={handleChangeCheckbox}
+                                />
+                                <label htmlFor="publico" className="ml-2 text-sm font-medium text-gray-700">
+                                    <div className="flex items-center">
+                                        <CheckCircle className="w-4 h-4 mr-1 text-blue-500" />
+                                        Entreno público
+                                    </div>
+                                </label>
+                            </div>
+                            <p className="mt-1 text-sm text-gray-500">
+                                Si está marcado, el entreno será visible para todos los usuarios.
+                            </p>
+
                         </div>
 
                         <div className="flex justify-end">

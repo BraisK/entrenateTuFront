@@ -15,6 +15,18 @@ export class TrainService {
             credentials: 'include'
         })
     }
+    static async comunidad(title?: string) {
+        let url = API_URL_BASE+'/comunidad?'
+        if(title) url += 'title='+title
+
+        return await fetchAPI(url,{
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        })
+    }
 
     static async getById(id:number) {
         return await fetchAPI(API_URL_BASE+'/trains/'+id,{

@@ -9,6 +9,7 @@ import Navbar from './components/Navbar'
 import { Toaster } from 'react-hot-toast'
 import Footer from './components/Footer'
 import Trains from './pages/TrainsList'
+import Comunidad from './pages/ComunidadList'
 import TrainForm from './pages/TrainForm'
 import TrainDetail from './pages/TrainDetail'
 import Suggestions from './pages/SuggestionsList'
@@ -30,6 +31,7 @@ function App() {
               <Route path="/profile" element={<Profile />} />
               <Route path="/userList" element={<UserList />} />
               <Route path="/trains" element={<Trains />} />
+              <Route path="/comunidad" element={<Comunidad />} />
               <Route path="/trains/:id" element={<TrainDetail />} />
               <Route path="/trains/new" element={<TrainForm />} />
               <Route path="/trains/edit/:id" element={<TrainForm />} />
