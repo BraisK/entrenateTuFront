@@ -3,8 +3,20 @@ import { TrainService } from "../services/trainService"
 import { Link, useSearchParams } from "react-router-dom"
 import toast from "react-hot-toast"
 import type Train from "../models/Train"
-import { Search, Plus, Eye, Edit, Trash2, UserIcon, Calendar} from "lucide-react"
+import { Search, Plus, Eye, Edit, Trash2, UserIcon, Calendar } from "lucide-react"
 import { StarRating } from "../components/StarRating"
+interface Exercise {
+  repetitions: number
+  distance: number
+  unit: string
+  style: string
+  notes: string
+}
+
+interface Series {
+  count: number
+  exercises: Exercise[]
+}
 
 function TrainList() {
   const [queryparams, setQueryParams] = useSearchParams()
@@ -129,7 +141,52 @@ function TrainList() {
                     )}
                   </div>
 
-                  <p className="text-gray-600 mb-4">{train.description}</p>
+                  {(() => {
+                    try {
+                      const parsedSeries: Series[] = JSON.parse(train.description ?? "")
+                      if (!Array.isArray(parsedSeries)) throw new Error()
+
+                      let totalMeters = 0
+
+                      parsedSeries.forEach((serie) => {
+                        serie.exercises.forEach((exercise) => {
+                          const total = exercise.repetitions * exercise.distance * serie.count
+                          if (exercise.unit === "m") {
+                            totalMeters += total
+                          } else if (exercise.unit === "yd") {
+                            totalMeters += total * 0.9144 // 1 yd = 0.9144 m
+                          }
+                        })
+                      })
+
+                      return (
+                        <div className="text-gray-600 mb-4 space-y-2">
+                          {parsedSeries.map((serie, seriesIndex) => (
+                            <div key={seriesIndex}>
+                              <p className="font-medium text-gray-700">
+                                Bloque {seriesIndex + 1}: {serie.count} {serie.count === 1 ? "Serie" : "Series"}
+                              </p>
+                              <ul className="text-sm pl-4 list-disc">
+                                {serie.exercises.map((exercise, exerciseIndex) => (
+                                  <li key={exerciseIndex}>
+                                    {exercise.repetitions}x{exercise.distance} {exercise.unit} {exercise.style}
+                                    {exercise.notes && <span className="text-gray-500"> ({exercise.notes})</span>}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ))}
+
+                          <p className="mt-2 text-sm font-semibold text-blue-700">
+                            Total: {Math.round(totalMeters)} m
+                          </p>
+                        </div>
+                      )
+                    } catch {
+                      return <p className="text-gray-600 mb-4">{train.description}</p>
+                    }
+                  })()}
+
 
                   <div className="flex items-center text-sm text-gray-500 mb-2">
                     <Calendar className="w-4 h-4 mr-1.5 text-blue-500" />

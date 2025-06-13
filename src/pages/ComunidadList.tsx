@@ -3,13 +3,26 @@ import { TrainService } from "../services/trainService"
 import { Link, useSearchParams } from "react-router-dom"
 import toast from "react-hot-toast"
 import type Train from "../models/Train"
-import { Search,  Eye, Edit, Trash2, UserIcon, Calendar} from "lucide-react"
+import { Search, Eye, Trash2, UserIcon, Calendar } from "lucide-react"
 import { StarRating } from "../components/StarRating"
+import { useAuth } from "../contexts/AuthContext"
+interface Exercise {
+  repetitions: number
+  distance: number
+  unit: string
+  style: string
+  notes: string
+}
 
-function TrainList() {
+interface Series {
+  count: number
+  exercises: Exercise[]
+}
+
+function ComunidadList() {
   const [queryparams, setQueryParams] = useSearchParams()
   const searchTitle = queryparams.get("title") || ""
-
+  const { user, isAdmin } = useAuth()
   const [trains, setTrains] = useState<Train[]>()
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -29,15 +42,22 @@ function TrainList() {
   }
 
   async function handleDelete(id: number) {
-    if (!window.confirm("¿Estás seguro de que quieres borrar este entreno?")) return
+    if (!window.confirm("¿Estás seguro de que quieres ocultar este entreno (ponerlo como no público)?")) return;
+
     try {
-      await TrainService.delete(id)
-      setTrains(trains?.filter((train) => train.id != id))
-      toast.success("Entreno borrado correctamente.")
+      await TrainService.update(id, { publico: false }); // Cambia el valor de `publico` a false
+
+      // Opcional: actualiza el estado local para reflejar el cambio
+      setTrains(trains?.map((train) =>
+        train.id === id ? { ...train, publico: false } : train
+      ));
+
+      toast.success("Entreno ocultado correctamente.");
     } catch (error) {
-      setError(error instanceof Error ? error.message : "Error desconocido")
+      setError(error instanceof Error ? error.message : "Error desconocido");
     }
   }
+
 
   // Función para formatear la fecha
   const formatDate = (dateString: string) => {
@@ -102,68 +122,104 @@ function TrainList() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {trains?.map((train) => {
-          // Calculamos la valoración promedio y el número de valoraciones
-
-          return (
-            <div key={train.id} className="group">
-              <div
-                className={`bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md h-full flex flex-col
-                  ${train.active ? "border-2 border-green-500" : "border-2 border-red-500"}`}
-              >
-                <div className="p-6 flex-grow">
-                  <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-xl font-semibold text-gray-800">{train.title}</h3>
-                    {!train.active && (
-                      <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                        Inactivo
-                      </span>
-                    )}
-                  </div>
-
-                  <p className="text-gray-600 mb-4">{train.description}</p>
-
-                  <div className="flex items-center text-sm text-gray-500 mb-2">
-                    <Calendar className="w-4 h-4 mr-1.5 text-blue-500" />
-                    <span>Publicado: {formatDate(train.published)}</span>
-                  </div>
-
-                  {train.userCreator && (
-                    <div className="mt-4 flex items-center bg-blue-50 p-2 rounded-lg">
-                      <div className="bg-blue-100 p-1.5 rounded-full mr-2">
-                        <UserIcon className="w-4 h-4 text-blue-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-700">
-                          {train.userCreator.name} {train.userCreator.surname || ""}
-                        </p>
-                        <p className="text-xs text-gray-500">{train.userCreator.email}</p>
-                      </div>
-                    </div>
+        {trains?.map((train) => (
+          <div key={train.id} className="group">
+            <div
+              className={`bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md h-full flex flex-col
+              ${train.active ? "border-2 border-green-500" : "border-2 border-red-500"}`}
+            >
+              <div className="p-6 flex-grow">
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-xl font-semibold text-gray-800">{train.title}</h3>
+                  {!train.active && (
+                    <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                      Inactivo
+                    </span>
                   )}
-
-                  <div className="mb-6">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-3">Valoración</h2>
-                    <StarRating idTrain={Number(train.id)} />
-                  </div>
                 </div>
 
-                <div className="bg-gray-50 px-6 py-4 border-t border-gray-100">
-                  <div className="flex items-center justify-start space-x-3">
-                    <Link
-                      to={`/trains/${train.id}`}
-                      className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors"
-                    >
-                      <Eye className="w-4 h-4 mr-1" />
-                      Ver
-                    </Link>
-                    <Link
-                      to={`/trains/edit/${train.id}`}
-                      className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors"
-                    >
-                      <Edit className="w-4 h-4 mr-1" />
-                      Editar
-                    </Link>
+                {(() => {
+                  try {
+                    const parsedSeries: Series[] = JSON.parse(train.description ?? "")
+                    if (!Array.isArray(parsedSeries)) throw new Error()
+
+                    let totalMeters = 0
+
+                    parsedSeries.forEach((serie) => {
+                      serie.exercises.forEach((exercise) => {
+                        const total = exercise.repetitions * exercise.distance * serie.count
+                        if (exercise.unit === "m") {
+                          totalMeters += total
+                        } else if (exercise.unit === "yd") {
+                          totalMeters += total * 0.9144 // 1 yd = 0.9144 m
+                        }
+                      })
+                    })
+
+                    return (
+                      <div className="text-gray-600 mb-4 space-y-2">
+                        {parsedSeries.map((serie, seriesIndex) => (
+                          <div key={seriesIndex}>
+                            <p className="font-medium text-gray-700">
+                              Bloque {seriesIndex + 1}: {serie.count} {serie.count === 1 ? "Serie" : "Series"}
+                            </p>
+                            <ul className="text-sm pl-4 list-disc">
+                              {serie.exercises.map((exercise, exerciseIndex) => (
+                                <li key={exerciseIndex}>
+                                  {exercise.repetitions}x{exercise.distance} {exercise.unit} {exercise.style}
+                                  {exercise.notes && <span className="text-gray-500"> ({exercise.notes})</span>}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+
+                        <p className="mt-2 text-sm font-semibold text-blue-700">
+                          Total: {Math.round(totalMeters)} m
+                        </p>
+                      </div>
+                    )
+                  } catch {
+                    return <p className="text-gray-600 mb-4">{train.description}</p>
+                  }
+                })()}
+
+
+                <div className="flex items-center text-sm text-gray-500 mb-2">
+                  <Calendar className="w-4 h-4 mr-1.5 text-blue-500" />
+                  <span>Publicado: {formatDate(train.published)}</span>
+                </div>
+
+                {train.userCreator && (
+                  <div className="mt-4 flex items-center bg-blue-50 p-2 rounded-lg">
+                    <div className="bg-blue-100 p-1.5 rounded-full mr-2">
+                      <UserIcon className="w-4 h-4 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">
+                        {train.userCreator.name} {train.userCreator.surname || ""}
+                      </p>
+                      <p className="text-xs text-gray-500">{train.userCreator.email}</p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="mb-6">
+                  <h2 className="text-xl font-semibold text-gray-800 mb-3">Valoración</h2>
+                  <StarRating idTrain={Number(train.id)} />
+                </div>
+              </div>
+
+              <div className="bg-gray-50 px-6 py-4 border-t border-gray-100">
+                <div className="flex items-center justify-start space-x-3">
+                  <Link
+                    to={`/trains/${train.id}`}
+                    className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors"
+                  >
+                    <Eye className="w-4 h-4 mr-1" />
+                    Ver
+                  </Link>
+                  {(isAdmin || user?.id === train.userCreator?.id) && (
                     <button
                       className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors"
                       onClick={() => handleDelete(train.id)}
@@ -171,15 +227,15 @@ function TrainList() {
                       <Trash2 className="w-4 h-4 mr-1" />
                       Borrar
                     </button>
-                  </div>
+                  )}
                 </div>
               </div>
             </div>
-          )
-        })}
+          </div>
+        ))}
       </div>
     </div>
   )
 }
 
-export default TrainList
+export default ComunidadList
