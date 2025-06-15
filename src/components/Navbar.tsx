@@ -87,7 +87,7 @@ function Navbar() {
                                 <Waves className="text-white w-5 h-5 sm:w-7 sm:h-7" />
                             </div>
                             <span className="text-white text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-wide select-none hover:text-blue-200 transition duration-300">
-                                EntrenateTu
+                                SwimTrack
                             </span>
                         </Link>
 
