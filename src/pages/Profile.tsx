@@ -2,20 +2,56 @@ import { useEffect, useState } from "react"
 import { UserService } from "../services/userServices"
 import type User from "../models/User"
 import { UserCircle, Mail, UserCheck, BellRing } from "lucide-react"
+import toast from "react-hot-toast"
 
 function Profile() {
     const [user, setUser] = useState<User | null>(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
+    const [editMode, setEditMode] = useState(false)
+    const [form, setForm] = useState({ name: "", surname: "", accepNotifications: false })
+    const [saving, setSaving] = useState(false)
 
     useEffect(() => {
         UserService.getProfile()
-            .then(setUser)
+            .then((u) => {
+                setUser(u)
+                setForm({ name: u.name, surname: u.surname || "", accepNotifications: !!u.accepNotifications })
+            })
             .catch((err) => {
                 setError(err instanceof Error ? err.message : "Error desconocido")
             })
             .finally(() => setLoading(false))
     }, [])
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value, type, checked } = e.target
+        setForm((prev) => ({
+            ...prev,
+            [name]: type === "checkbox" ? checked : value
+        }))
+    }
+
+    const handleSave = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setSaving(true)
+        setError(null)
+        try {
+            const updated = await UserService.updateProfile({
+                name: form.name,
+                surname: form.surname,
+                accepNotifications: form.accepNotifications
+            })
+            setUser((prev) => prev ? { ...prev, ...updated } : prev)
+            toast.success("Perfil actualizado correctamente")
+            setEditMode(false)
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Error al actualizar perfil")
+            toast.error(err instanceof Error ? err.message : "Error al actualizar perfil")
+        } finally {
+            setSaving(false)
+        }
+    }
 
     if (loading) {
         return (
@@ -66,21 +102,77 @@ function Profile() {
                         <div className="bg-blue-100 p-4 rounded-full mb-4">
                             <UserCircle className="h-16 w-16 text-blue-500" />
                         </div>
-                        <h1 className="text-2xl font-bold text-gray-800">
-                            {user.name} {user.surname || ""}
-                        </h1>
-                        <p className="text-gray-600 mt-1">{user.email}</p>
-                        <div className="mt-4">
-                            <span
-                                className={`px-2 py-1 rounded-md text-xs font-medium
-                                                    ${user.role === "admin" ? "bg-purple-100 text-purple-800" :
-                                        user.role === "premium" ? "bg-yellow-100 text-yellow-700" :
-                                            "bg-blue-100 text-blue-800"}
-                                                `}
-                            >
-                                {user.role}
-                            </span>
-                        </div>
+                        {editMode ? (
+                            <form className="w-full max-w-xs mx-auto" onSubmit={handleSave}>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={form.name}
+                                    onChange={handleChange}
+                                    className="block w-full mb-2 px-3 py-2 border rounded-lg text-gray-800"
+                                    placeholder="Nombre"
+                                    required
+                                />
+                                <input
+                                    type="text"
+                                    name="surname"
+                                    value={form.surname}
+                                    onChange={handleChange}
+                                    className="block w-full mb-2 px-3 py-2 border rounded-lg text-gray-800"
+                                    placeholder="Apellidos"
+                                />
+                                <label className="flex items-center mb-2">
+                                    <input
+                                        type="checkbox"
+                                        name="accepNotifications"
+                                        checked={form.accepNotifications}
+                                        onChange={handleChange}
+                                        className="mr-2"
+                                    />
+                                    <span className="text-gray-700">Recibir notificaciones</span>
+                                </label>
+                                <div className="flex gap-2 mt-2">
+                                    <button
+                                        type="submit"
+                                        disabled={saving}
+                                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                    >
+                                        {saving ? "Guardando..." : "Guardar"}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => { setEditMode(false); setForm({ name: user.name, surname: user.surname || "", accepNotifications: !!user.accepNotifications }) }}
+                                        className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                                    >
+                                        Cancelar
+                                    </button>
+                                </div>
+                            </form>
+                        ) : (
+                            <>
+                                <h1 className="text-2xl font-bold text-gray-800">
+                                    {user.name} {user.surname || ""}
+                                </h1>
+                                <p className="text-gray-600 mt-1">{user.email}</p>
+                                <div className="mt-4">
+                                    <span
+                                        className={`px-2 py-1 rounded-md text-xs font-medium
+                                            ${user.role === "admin" ? "bg-purple-100 text-purple-800" :
+                                                user.role === "premium" ? "bg-yellow-100 text-yellow-700" :
+                                                    "bg-blue-100 text-blue-800"}
+                                        `}
+                                    >
+                                        {user.role}
+                                    </span>
+                                </div>
+                                <button
+                                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                                    onClick={() => setEditMode(true)}
+                                >
+                                    Editar mi perfil
+                                </button>
+                            </>
+                        )}
                     </div>
                 </div>
 
