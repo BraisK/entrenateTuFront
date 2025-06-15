@@ -72,8 +72,11 @@ function Profile() {
                         <p className="text-gray-600 mt-1">{user.email}</p>
                         <div className="mt-4">
                             <span
-                                className={`px-3 py-1 rounded-full text-sm font-medium ${user.role === "admin" ? "bg-purple-100 text-purple-800" : "bg-blue-100 text-blue-800"
-                                    }`}
+                                className={`px-2 py-1 rounded-md text-xs font-medium
+                                                    ${user.role === "admin" ? "bg-purple-100 text-purple-800" :
+                                        user.role === "premium" ? "bg-yellow-100 text-yellow-700" :
+                                            "bg-blue-100 text-blue-800"}
+                                                `}
                             >
                                 {user.role}
                             </span>

@@ -5,7 +5,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import { TrainService } from "../services/trainService"
 import type Train from "../models/Train"
 import { StarRating } from "../components/StarRating"
-import { Calendar, Clock, ArrowLeft, Ruler } from "lucide-react"
+import { Calendar, ArrowLeft, Ruler } from "lucide-react"
 
 // Interfaces para el manejo de series de ejercicios
 interface Exercise {
@@ -128,7 +128,6 @@ function TrainDetail() {
                         </button>
                     </div>
 
-                    {/* Mostrar el conteo total de metros/yardas */}
                     {series.length > 0 && (
                         <div className="bg-green-50 rounded-lg p-4 mb-6 border border-green-100">
                             <div className="flex items-center mb-2">
@@ -146,7 +145,6 @@ function TrainDetail() {
                         </div>
                     )}
 
-                    {/* Mostrar las series de ejercicios */}
                     {series.length > 0 ? (
                         <div className="bg-blue-50 rounded-lg p-4 mb-6 border border-blue-100">
                             <h2 className="text-lg font-semibold text-gray-800 mb-3">Descripción del entreno</h2>
@@ -168,7 +166,6 @@ function TrainDetail() {
                                             ))}
                                         </ul>
 
-                                        {/* Mostrar el subtotal de metros por serie */}
                                         <div className="mt-2 text-xs text-gray-500 flex justify-end">
                                             <span>
                                                 Subtotal:{" "}
@@ -198,20 +195,12 @@ function TrainDetail() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-blue-50 rounded-lg p-4">
-                            <div className="flex items-center mb-2">
+                        <div className="bg-blue-50 rounded-lg p-4 w-full text-center">
+                            <div className="flex items-center justify-center mb-2">
                                 <Calendar className="w-5 h-5 text-blue-600 mr-2" />
                                 <h3 className="text-md font-medium text-gray-800">Fecha de publicación</h3>
                             </div>
                             <p className="text-gray-700">{new Date(train.published).toLocaleString()}</p>
-                        </div>
-
-                        <div className="bg-blue-50 rounded-lg p-4">
-                            <div className="flex items-center mb-2">
-                                <Clock className="w-5 h-5 text-blue-600 mr-2" />
-                                <h3 className="text-md font-medium text-gray-800">Fecha de finalización</h3>
-                            </div>
-                            <p className="text-gray-700">{new Date(train.expired).toLocaleString()}</p>
                         </div>
                     </div>
                 </div>

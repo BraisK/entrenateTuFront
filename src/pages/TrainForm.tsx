@@ -7,7 +7,7 @@ import { TrainService } from "../services/trainService"
 import { useNavigate, useParams } from "react-router-dom"
 import { Temporal } from "temporal-polyfill"
 import toast from "react-hot-toast"
-import { Calendar, Clock, CheckCircle, Save, ArrowLeft, Plus, Trash2, Ruler } from "lucide-react"
+import { CheckCircle, Save, ArrowLeft, Plus, Trash2, Ruler } from "lucide-react"
 
 // Interfaces para el manejo de series de ejercicios
 interface Exercise {
@@ -185,30 +185,49 @@ function TrainForm() {
     }
 
 
-    const handleSubmit = (e: FormEvent) => {
-        try {
-            e.preventDefault()
+    type TrainResponse = {
+        error?: string
+        // Si esperas más campos específicos, agrégalos aquí explícitamente
+        success?: boolean
+        data?: unknown
+    }
 
-            // Generamos la descripción a partir de las series
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault()
+        setLoading(true)
+        setError(null)
+
+        try {
             const formData = {
                 ...datosForm,
-                description: generateDescription(), // Guardamos las series como JSON en el campo description
+                description: generateDescription(),
                 published: new Date(datosForm.published || "").toISOString(),
                 expired: new Date(datosForm.expired || "").toISOString(),
             }
 
-            if (id) TrainService.update(Number(id), formData)
-            else TrainService.create(formData)
+            const response: TrainResponse = id
+                ? await TrainService.update(Number(id), formData)
+                : await TrainService.create(formData)
 
-            navigate("/trains")
+            if (response.error) {
+                const msg = response.error.toLowerCase().includes("limit")
+                    ? "Has alcanzado el límite de entrenos de la versión gratuita"
+                    : response.error
+                throw new Error(msg)
+            }
+
             toast.success("Entreno guardado correctamente")
+            navigate("/trains")
         } catch (error) {
-            setError(error instanceof Error ? error.message : "Error desconocido")
-            toast.error("Error al guardar el entreno")
+            const msg =
+                error instanceof Error ? error.message : typeof error === "string" ? error : "Error desconocido"
+            setError(msg)
+            toast.error(msg)
         } finally {
             setLoading(false)
         }
     }
+
 
     if (loading)
         return (
@@ -261,7 +280,6 @@ function TrainForm() {
                                 />
                             </div>
 
-                            {/* Mostrar el conteo total de metros/yardas */}
                             <div className="bg-green-50 rounded-lg p-4 border border-green-100">
                                 <div className="flex items-center mb-2">
                                     <Ruler className="w-5 h-5 text-green-600 mr-2" />
@@ -277,7 +295,6 @@ function TrainForm() {
                                 </div>
                             </div>
 
-                            {/* Sección de series de ejercicios */}
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center">
                                     <label className="block text-sm font-medium text-gray-700">Series de ejercicios</label>
@@ -291,13 +308,11 @@ function TrainForm() {
                                     </button>
                                 </div>
 
-                                {/* Vista previa de la descripción */}
                                 <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
                                     <p className="text-sm text-gray-700 font-medium mb-1">Vista previa:</p>
                                     <p className="text-sm text-gray-600">{formatSeriesAsText()}</p>
                                 </div>
 
-                                {/* Series */}
                                 <div className="space-y-6">
                                     {series.map((serie, seriesIndex) => {
                                         // Calcular subtotal para esta serie
@@ -334,7 +349,6 @@ function TrainForm() {
                                                     </div>
                                                 </div>
 
-                                                {/* Ejercicios */}
                                                 <div className="space-y-3">
                                                     {serie.exercises.map((exercise, exerciseIndex) => (
                                                         <div key={exerciseIndex} className="bg-white p-3 rounded border border-gray-200">
@@ -415,8 +429,6 @@ function TrainForm() {
                                                                         <option value="braza">Braza</option>
                                                                         <option value="mariposa">Mariposa</option>
                                                                         <option value="estilos">Estilos</option>
-                                                                        <option value="suave">Suave</option>
-                                                                        <option value="técnica">Técnica</option>
                                                                     </select>
                                                                 </div>
                                                                 <div className="col-span-2 md:col-span-4">
@@ -447,42 +459,6 @@ function TrainForm() {
                                             </div>
                                         )
                                     })}
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label htmlFor="published" className="block mb-2 text-sm font-medium text-gray-700">
-                                        <div className="flex items-center">
-                                            <Calendar className="w-4 h-4 mr-1 text-blue-500" />
-                                            Fecha de publicación
-                                        </div>
-                                    </label>
-                                    <input
-                                        type="datetime-local"
-                                        id="published"
-                                        className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                                        name="published"
-                                        value={datosForm.published}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <div>
-                                    <label htmlFor="expired" className="block mb-2 text-sm font-medium text-gray-700">
-                                        <div className="flex items-center">
-                                            <Clock className="w-4 h-4 mr-1 text-blue-500" />
-                                            Fecha de finalización
-                                        </div>
-                                    </label>
-                                    <input
-                                        type="datetime-local"
-                                        id="expired"
-                                        className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                                        name="expired"
-                                        value={datosForm.expired}
-                                        onChange={handleChange}
-                                    />
                                 </div>
                             </div>
 

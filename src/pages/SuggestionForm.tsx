@@ -4,7 +4,7 @@ import { type FormEvent, useEffect, useState } from "react"
 import useFormHook from "../components/FormHook"
 import type Suggestion from "../models/Suggestion"
 import { SuggestionService } from "../services/suggestionService"
-import { useNavigate, useParams, Link } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { Temporal } from "temporal-polyfill"
 import toast from "react-hot-toast"
 
@@ -67,13 +67,7 @@ function SuggestionForm() {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <div className="max-w-2xl mx-auto bg-white rounded-md shadow-sm p-6">
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold text-gray-800">{id ? "Editar Sugerencia" : "Nueva Sugerencia"}</h1>
-                    <Link to="/suggestions" className="text-blue-500 hover:text-blue-700 text-sm font-medium">
-                        Volver a sugerencias
-                    </Link>
-                </div>
+            <div className="max-w-2xl mx-auto bg-white rounded-md shadow-md p-6">
 
                 {error && (
                     <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-md">

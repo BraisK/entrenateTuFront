@@ -14,6 +14,7 @@ import TrainForm from './pages/TrainForm'
 import TrainDetail from './pages/TrainDetail'
 import Suggestions from './pages/SuggestionsList'
 import SuggestionForm from './pages/SuggestionForm'
+import Pricing from './pages/Pricing'
 
 function App() {
 
@@ -31,6 +32,7 @@ function App() {
               <Route path="/profile" element={<Profile />} />
               <Route path="/userList" element={<UserList />} />
               <Route path="/trains" element={<Trains />} />
+              <Route path="/pricing" element={<Pricing />} />
               <Route path="/comunidad" element={<Comunidad />} />
               <Route path="/trains/:id" element={<TrainDetail />} />
               <Route path="/trains/new" element={<TrainForm />} />
