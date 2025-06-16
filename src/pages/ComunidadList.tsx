@@ -1,7 +1,7 @@
 import { type ChangeEvent, useEffect, useState } from "react"
 import { TrainService } from "../services/trainService"
 import { Link, useSearchParams } from "react-router-dom"
-import toast from "react-hot-toast"
+/*import toast from "react-hot-toast"*/
 import type Train from "../models/Train"
 import { Search, Eye, UserIcon, Calendar } from "lucide-react"
 import { StarRating } from "../components/StarRating"
