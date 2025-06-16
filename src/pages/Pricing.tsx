@@ -7,7 +7,7 @@ export default function PricingPage() {
     const plans = [
         {
             name: "Básico",
-            price: "GRATIS",
+            price: "0.00",
             period: "mes",
             description: "Perfecto para nadadores principiantes",
             icon: <Users className="w-8 h-8 text-blue-500" />,
