@@ -219,15 +219,7 @@ function ComunidadList() {
                     <Eye className="w-4 h-4 mr-1" />
                     Ver
                   </Link>
-                  {(isAdmin || user?.id === train.userCreator?.id) && (
-                    <button
-                      className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors"
-                      onClick={() => handleDelete(train.id)}
-                    >
-                      <Trash2 className="w-4 h-4 mr-1" />
-                      Borrar
-                    </button>
-                  )}
+                  
                 </div>
               </div>
             </div>
