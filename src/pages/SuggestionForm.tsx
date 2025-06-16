@@ -53,7 +53,7 @@ function SuggestionForm() {
             }
             if (id) SuggestionService.update(Number(id), formData)
             else SuggestionService.create(formData)
-            navigate("/suggestions")
+            navigate("/")
             toast.success("Sugerencia guardada correctamente")
         } catch (error) {
             setError(error instanceof Error ? error.message : "Error desconocido")
