@@ -5,7 +5,7 @@ export default function Home() {
   const plans = [
     {
       name: "Básico",
-      price: "GRATIS",
+      price: "0.00",
       description: "Perfecto para nadadores principiantes",
       icon: <Users className="w-6 h-6 text-blue-500" />,
       popular: false,
