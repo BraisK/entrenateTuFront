@@ -3,7 +3,7 @@ import { TrainService } from "../services/trainService"
 import { Link, useSearchParams } from "react-router-dom"
 import toast from "react-hot-toast"
 import type Train from "../models/Train"
-import { Search, Eye, Trash2, UserIcon, Calendar } from "lucide-react"
+import { Search, Eye, UserIcon, Calendar } from "lucide-react"
 import { StarRating } from "../components/StarRating"
 import { useAuth } from "../contexts/AuthContext"
 interface Exercise {
@@ -41,7 +41,7 @@ function ComunidadList() {
     setQueryParams(newTitle ? { title: newTitle } : {})
   }
 
-  async function handleDelete(id: number) {
+  /*async function handleDelete(id: number) {
     if (!window.confirm("¿Estás seguro de que quieres ocultar este entreno (ponerlo como no público)?")) return;
 
     try {
@@ -56,7 +56,7 @@ function ComunidadList() {
     } catch (error) {
       setError(error instanceof Error ? error.message : "Error desconocido");
     }
-  }
+  }*/
 
 
   // Función para formatear la fecha
