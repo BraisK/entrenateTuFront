@@ -5,7 +5,7 @@ import { Link, useSearchParams } from "react-router-dom"
 import type Train from "../models/Train"
 import { Search, Eye, UserIcon, Calendar } from "lucide-react"
 import { StarRating } from "../components/StarRating"
-import { useAuth } from "../contexts/AuthContext"
+/*import { useAuth } from "../contexts/AuthContext"*/
 interface Exercise {
   repetitions: number
   distance: number
@@ -22,7 +22,7 @@ interface Series {
 function ComunidadList() {
   const [queryparams, setQueryParams] = useSearchParams()
   const searchTitle = queryparams.get("title") || ""
-  const { user, isAdmin } = useAuth()
+  /*const { user, isAdmin } = useAuth()*/
   const [trains, setTrains] = useState<Train[]>()
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
